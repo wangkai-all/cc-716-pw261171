@@ -1,0 +1,15 @@
+{
+  "name": "representative-sample-picker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "多维工况记录的代表点挑选（最远点贪心 + 小规模精确枚举）",
+  "scripts": {
+    "test": "node --test",
+    "test:ui": "node scripts/ui.smoke.mjs && node scripts/ui.audit.mjs",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0"
+  }
+}

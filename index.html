@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>代表点挑选 · 多维工况记录</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>代表点挑选</h1>
+    <p class="subtitle">少量虚构设备的多维工况记录 · 目标：让任何未选记录离最近代表点都尽量近（最小化最坏覆盖半径）</p>
+  </header>
+
+  <ol class="pipeline" aria-label="计算流程">
+    <li>① 维度业务尺度</li>
+    <li>② 可参与样本范围</li>
+    <li>③ 完整距离表</li>
+    <li>④ 代表点选择</li>
+    <li>⑤ 分配与半径</li>
+  </ol>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <section class="card" aria-labelledby="h-dims">
+        <h2 id="h-dims">① 维度与业务尺度</h2>
+        <p class="hint">距离在「值 ÷ 尺度」归一化空间计算；改尺度后全链路同步重算。</p>
+        <table class="dim-table">
+          <thead>
+            <tr><th>参与</th><th>维度</th><th>单位</th><th>业务尺度</th></tr>
+          </thead>
+          <tbody id="dim-rows"></tbody>
+        </table>
+      </section>
+
+      <section class="card" aria-labelledby="h-constraints">
+        <h2 id="h-constraints">约束（实际进入选择过程）</h2>
+        <div class="field">
+          <label for="k-input">代表点数量 k</label>
+          <input id="k-input" type="number" min="1" max="18" step="1" />
+        </div>
+        <div class="field">
+          <label class="check">
+            <input id="exclude-faulty" type="checkbox" />
+            排除故障采集记录（退出参与范围）
+          </label>
+        </div>
+        <fieldset class="field">
+          <legend>设备类型最低名额</legend>
+          <div id="quota-inputs" class="quota-grid"></div>
+        </fieldset>
+        <fieldset class="field">
+          <legend>必选样本（保留某条）</legend>
+          <div id="pin-list" class="pin-list"></div>
+        </fieldset>
+      </section>
+
+      <section class="card" aria-labelledby="h-scope">
+        <h2 id="h-scope">② 可参与样本范围</h2>
+        <p class="hint">缺失维度的记录先退出范围，不与完整记录比距离。</p>
+        <div id="scope-summary"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <div id="alerts" class="alerts" role="status"></div>
+
+      <section class="results" aria-label="两种方法的结果对比">
+        <article class="card result-card" id="result-greedy" aria-labelledby="h-greedy">
+          <h2 id="h-greedy">最远点贪心</h2>
+          <div class="result-body"></div>
+        </article>
+        <article class="card result-card" id="result-exact" aria-labelledby="h-exact">
+          <h2 id="h-exact">精确枚举（≤18 条核对）</h2>
+          <div class="result-body"></div>
+        </article>
+      </section>
+      <p id="compare-line" class="compare-line"></p>
+
+      <section class="card" aria-labelledby="h-plot">
+        <div class="plot-head">
+          <h2 id="h-plot">归一化二维投影</h2>
+          <div class="plot-controls" id="plot-controls"></div>
+        </div>
+        <div class="plot-wrap" id="plot-wrap">
+          <svg id="scatter" role="img" aria-label="归一化坐标散点图：代表点与其覆盖关系"></svg>
+          <div id="tooltip" class="tooltip" hidden></div>
+        </div>
+        <div id="legend" class="legend"></div>
+        <div id="coverage-panel" class="coverage-panel" hidden></div>
+      </section>
+
+      <section class="card" aria-labelledby="h-records">
+        <h2 id="h-records">全部记录与归属</h2>
+        <p class="hint">坐标相同、来源不同的记录按血缘分别保留，不去重；「禁选」只取消其代表点资格，记录仍被覆盖。</p>
+        <div class="table-scroll">
+          <table class="records-table">
+            <thead id="records-head"></thead>
+            <tbody id="records-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <details class="card" id="dist-details">
+        <summary>③ 完整距离表（可参与记录两两距离，归一化空间）</summary>
+        <div class="table-scroll" id="dist-matrix"></div>
+      </details>
+
+      <section class="card" aria-labelledby="h-export">
+        <h2 id="h-export">导出</h2>
+        <div class="export-row">
+          <button id="export-selected" type="button">导出选中样本 CSV</button>
+          <button id="export-assign" type="button">导出全部记录归属 CSV</button>
+          <button id="export-json" type="button">导出完整结果 JSON</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
